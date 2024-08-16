@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { Filter } from './components/Filter'
+import { PersonForm } from './components/PersonForm'
+import { Persons } from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -23,7 +26,7 @@ const App = () => {
   }
 
   //AÑADE TEMPORALMENTE UN NUEVOS OBJETO A LA LISTA
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
     const nameObject = {//Creamos un objeto con los mismos valores de la lista
       name: newName, //Añadimos la variable newName(lo que tenemos en nuestro input) al objeto
@@ -43,32 +46,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <p>filter shown with: <input type="text" 
-                                   value={filterName}
-                                   onChange={handleInputFilter} 
-                            />
-      </p>
-      <form onSubmit={addName}>
-        <div>
-          name: <input value={newName}// ... fuerza al valor del input para que coincida con la variable de estado...
-                       onChange={handleInputName}// ... y actualiza la variable de estado en cada edición!
-                />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleInputNumber}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+       <Filter value={filterName} onChange={handleInputFilter} />
+       <h3>Add new name</h3>
+       <PersonForm addPerson={addPerson} newName={newName}  handleInputName={handleInputName}
+                    newNumber={newNumber} handleInputNumber={handleInputNumber} />
       <h2>Numbers</h2>
-      <ul>
-        {
-          myFilter.map((person,i) => {
-            return(<li key={i}>{person.name} {person.number}</li>)
-          })
-        }
-      </ul>
+      <Persons myFilter={myFilter}/>
     </div>
   )
 }
