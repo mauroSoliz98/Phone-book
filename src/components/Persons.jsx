@@ -3,7 +3,12 @@ export const Persons = ({myFilter}) => {
     <ul>
         {
         myFilter.map((person,i) => {
-            return(<li key={i}>{person.name} {person.number}</li>)
+            return(
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 5, margin:5}}>
+                <li>{person.name} {person.number}</li>
+                <button> Delete </button>
+              </div>
+            )
         })
         }
     </ul>

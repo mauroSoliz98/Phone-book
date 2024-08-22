@@ -21,14 +21,14 @@
       "id": "4"
     },
     {
-      "id": "5",
-      "name": "Mauro",
-      "number": "60748221"
+      "id": 5,
+      "name": "Mauro Soliz",
+      "number": "123456"
     },
     {
-      "id": "6",
-      "name": "Fabricio",
-      "number": "123456"
+      "id": 6,
+      "name": "Alejandra Martinez",
+      "number": "654123"
     }
   ]
 }

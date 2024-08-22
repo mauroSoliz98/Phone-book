@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
-import axios from 'axios'
+import personServices from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,7 +12,7 @@ const App = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const person = await axios.get('http://localhost:3004/persons')
+      const person = await personServices.getAll()
       const response = await person.data
       setPersons(response)
       console.log(response);
@@ -38,9 +38,10 @@ const App = () => {
     const personObject = {//Creamos un objeto con los mismos valores de la lista
       name: newName, //Añadimos la variable newName(lo que tenemos en nuestro input) al objeto
       number: newNumber,
+      id: persons.length + 1
     }
     //A continuacion usaremos axios para hacer un post
-    const newPerson = await axios.post('http://localhost:3004/persons', personObject)
+    const newPerson = await personServices.create(personObject)
     const response = await newPerson.data
     console.log(response);
     setPersons(persons.concat(response))
