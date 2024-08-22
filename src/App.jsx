@@ -51,7 +51,7 @@ const App = () => {
   
   //CREAMOS UNA VARIABLE FILTER QUE ES QUIEN SE ENCARGARÁ DE FILTRAR NUESTROS DATOS
   const myFilter = filterName 
-                  ? persons.filter( person => person.name === filterName )
+                  ? persons.filter( person => person.name.toLowerCase().startsWith(filterName.toLowerCase()))
                   : persons 
 
   return (
