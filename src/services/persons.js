@@ -1,12 +1,20 @@
 import axios from 'axios'
 const baseUrl = 'http://localhost:3004/persons'
 
-const getAll = () => {
-  return axios.get(baseUrl)
+const getAll = async() => {
+  const response = await axios.get(baseUrl)
+  return response.data
 }
 
-const create = newObject => {
-  return axios.post(baseUrl, newObject)
+const create = async (newObject) => {
+  const response = await axios.post(baseUrl, newObject)
+  return response.data
+}
+
+// use some other name for variable!
+const deleteObj = async(id) => {
+    const response = await axios.delete(`${baseUrl}/${id}`)
+    return response.data
 }
 
 const update = (id, newObject) => {
@@ -16,5 +24,6 @@ const update = (id, newObject) => {
 export default { 
   getAll: getAll, 
   create: create, 
-  update: update 
+  update: update,
+  deleteObj: deleteObj, 
 }

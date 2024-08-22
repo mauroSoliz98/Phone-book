@@ -12,10 +12,9 @@ const App = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const person = await personServices.getAll()
-      const response = await person.data
-      setPersons(response)
-      console.log(response);
+      const initialPersons = await personServices.getAll()
+      setPersons(initialPersons)
+      console.log(initialPersons);
     }
     fetchData()
   }, [])
@@ -35,19 +34,36 @@ const App = () => {
   //AÑADE UN NUEVOS OBJETO A LA LISTA
   const addPerson = async (event) => {
     event.preventDefault()
+    let id = persons.length + 1
     const personObject = {//Creamos un objeto con los mismos valores de la lista
       name: newName, //Añadimos la variable newName(lo que tenemos en nuestro input) al objeto
       number: newNumber,
-      id: persons.length + 1
+      id: id.toString()
     }
     //A continuacion usaremos axios para hacer un post
     const newPerson = await personServices.create(personObject)
-    const response = await newPerson.data
-    console.log(response);
-    setPersons(persons.concat(response))
+    console.log(newPerson);
+    setPersons(persons.concat(newPerson))
     setNewName('')
     setNewNumber('')
     
+  }
+  //ELIMINAR ELEMENTO
+  const toggleDeleteOf = async(person) => {
+    const {id, name} = person //desestructuramos el objeto
+    if (window.confirm(`¿Quieres elminar a ${name}?`)) {
+        try {
+          await personServices.deleteObj(id);//Llamamos al servicio delete
+          const updatedPersons = persons.filter(person => person.id !== id);
+          /*filter crea un nuevo array con todos los elementos que pasen la condición 
+          implementada en la función de callback.Por ende la manera de interpretar la linea de
+          codigo seria la siguiente "Todo aquellos elemento que no sean iguales al id seleccionado,
+          pasan al nuevo array"*/
+          setPersons(updatedPersons);
+        } catch (error) {
+          console.error('Error al eliminar la persona:', error);
+        }
+      }
   }
   
   //CREAMOS UNA VARIABLE FILTER QUE ES QUIEN SE ENCARGARÁ DE FILTRAR NUESTROS DATOS
@@ -63,7 +79,12 @@ const App = () => {
        <PersonForm addPerson={addPerson} newName={newName}  handleInputName={handleInputName}
                     newNumber={newNumber} handleInputNumber={handleInputNumber} />
       <h2>Numbers</h2>
-      <Persons myFilter={myFilter}/>
+      { myFilter.map((person, i) =>
+        <Persons key={i} 
+                person={person} 
+                onDelete={() => toggleDeleteOf(person)}/>
+      
+      )}
     </div>
   )
 }
