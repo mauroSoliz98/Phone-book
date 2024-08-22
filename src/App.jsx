@@ -1,18 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')  // Declara una variable de estado...
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('') //creamos un variable useState buleana
+
+  useEffect(() => {
+    async function fetchData() {
+      const person = await axios.get('http://localhost:3004/persons')
+      const response = await person.data
+      setPersons(response)
+      console.log(response);
+    }
+    fetchData()
+  }, [])
+  
 
   //ACTUALIZA EL ESTADO DEL INPUT
   const handleInputName = (event) => {
@@ -25,17 +32,21 @@ const App = () => {
     setFilterName(event.target.value)
   }
 
-  //AÑADE TEMPORALMENTE UN NUEVOS OBJETO A LA LISTA
-  const addPerson = (event) => {
+  //AÑADE UN NUEVOS OBJETO A LA LISTA
+  const addPerson = async (event) => {
     event.preventDefault()
-    const nameObject = {//Creamos un objeto con los mismos valores de la lista
+    const personObject = {//Creamos un objeto con los mismos valores de la lista
       name: newName, //Añadimos la variable newName(lo que tenemos en nuestro input) al objeto
       number: newNumber,
     }
-    setPersons(persons.concat(nameObject))//Agregamos ese objeto a nuestra lista persons
-    setNewName('')//Limpiamos el input
+    //A continuacion usaremos axios para hacer un post
+    const newPerson = await axios.post('http://localhost:3004/persons', personObject)
+    const response = await newPerson.data
+    console.log(response);
+    setPersons(persons.concat(response))
+    setNewName('')
     setNewNumber('')
-    alert(`${newName} was added`)
+    
   }
   
   //CREAMOS UNA VARIABLE FILTER QUE ES QUIEN SE ENCARGARÁ DE FILTRAR NUESTROS DATOS
