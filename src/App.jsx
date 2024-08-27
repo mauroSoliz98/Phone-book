@@ -3,12 +3,15 @@ import { Filter } from './components/Filter'
 import { PersonForm } from './components/PersonForm'
 import { Persons } from './components/Persons'
 import personServices from './services/persons'
+import { Modal } from './components/Modal'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')  // Declara una variable de estado...
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('') //creamos un variable useState buleana
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState([''])
 
   useEffect(() => {
     async function fetchData() {
@@ -55,15 +58,33 @@ const App = () => {
         try {
           await personServices.deleteObj(id);//Llamamos al servicio delete
           const updatedPersons = persons.filter(person => person.id !== id);
+          setPersons(updatedPersons);
           /*filter crea un nuevo array con todos los elementos que pasen la condición 
           implementada en la función de callback.Por ende la manera de interpretar la linea de
           codigo seria la siguiente "Todo aquellos elemento que no sean iguales al id seleccionado,
           pasan al nuevo array"*/
-          setPersons(updatedPersons);
         } catch (error) {
           console.error('Error al eliminar la persona:', error);
         }
       }
+  }
+  //EDITAR EL ELEMENTO
+  const showModal = (id) => {
+    console.log(`El id es: ${id}`)
+    setIsOpen(true)
+
+    const person = persons.find(p => p.id === id)
+    setSelectedItem(person)
+  }
+  const handdleUpdate = async (id) => {
+      console.log(`modificaste el elemento con el id: ${id}`);
+      const changePerson = {
+        name: selectedItem.name,
+        number: selectedItem.number
+      }
+      const response = await personServices.update(id, changePerson)
+      console.log(response);
+      setPersons(response)
   }
   
   //CREAMOS UNA VARIABLE FILTER QUE ES QUIEN SE ENCARGARÁ DE FILTRAR NUESTROS DATOS
@@ -72,20 +93,36 @@ const App = () => {
                   : persons 
 
   return (
-    <div>
-      <h2>Phonebook</h2>
-       <Filter value={filterName} onChange={handleInputFilter} />
-       <h3>Add new name</h3>
-       <PersonForm addPerson={addPerson} newName={newName}  handleInputName={handleInputName}
-                    newNumber={newNumber} handleInputNumber={handleInputNumber} />
-      <h2>Numbers</h2>
-      { myFilter.map((person, i) =>
-        <Persons key={i} 
-                person={person} 
-                onDelete={() => toggleDeleteOf(person)}/>
-      
-      )}
-    </div>
+    <div className='bg-gray-900 text-white h-screen'>
+      <div className='flex justify-between items-center bg-black h-14 mb-2 px-5'>
+        <h2>Phonebook</h2>
+        <Filter value={filterName} onChange={handleInputFilter} />
+      </div>
+      <div className='px-2'>
+        <h3>Add new name</h3>
+        <PersonForm onSubmit={addPerson} newName={newName}  handleInputName={handleInputName}
+                      newNumber={newNumber} handleInputNumber={handleInputNumber}
+                      titleButton={'Add'} />
+        <h2>Numbers</h2>
+        { myFilter.map((person, i) =>
+          <Persons key={i} 
+                  person={person} 
+                  onDelete={() => toggleDeleteOf(person)}
+                  setIsOpen={() => showModal(person.id)}/>
+            
+        )}
+        {/*Open Modal*/}
+        { isOpen && 
+          <Modal setIsOpen={setIsOpen}>
+            <PersonForm newName={selectedItem.name} newNumber={selectedItem.number} 
+              titleButton={'Update'}
+              handleInputName={(e)=>setSelectedItem({...selectedItem, name: e.target.value})}
+              handleInputNumber={(e)=>setSelectedItem({...selectedItem, number: e.target.value})}
+              onSubmit={() => handdleUpdate(selectedItem.id)}/>
+          </Modal>
+        }
+      </div>
+      </div>
   )
 }
 
