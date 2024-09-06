@@ -11,15 +11,21 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('') //creamos un variable useState buleana
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState([''])
+  const [selectedItem, setSelectedItem] = useState([])
 
-  useEffect(() => {
-    async function fetchData() {
-      const initialPersons = await personServices.getAll()
-      setPersons(initialPersons)
-      console.log(initialPersons);
+  const getPersons = async() => {
+    try {
+    const initialPersons = await personServices.getAll()
+    setPersons(initialPersons)
+    console.log(initialPersons);
+    } catch(error) { 
+      console.log(error);
+      
     }
-    fetchData()
+  }
+
+  useEffect(() => { 
+    getPersons()
   }, [])
   
 
@@ -104,13 +110,10 @@ const App = () => {
                       newNumber={newNumber} handleInputNumber={handleInputNumber}
                       titleButton={'Add'} />
         <h2>Numbers</h2>
-        { myFilter.map((person, i) =>
-          <Persons key={i} 
-                  person={person} 
-                  onDelete={() => toggleDeleteOf(person)}
-                  setIsOpen={() => showModal(person.id)}/>
-            
-        )}
+          <Persons  
+                  persons={myFilter} 
+                  onDelete={toggleDeleteOf}
+                  setIsOpen={showModal}/>
         {/*Open Modal*/}
         { isOpen && 
           <Modal setIsOpen={setIsOpen}>
